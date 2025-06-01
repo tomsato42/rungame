@@ -1,0 +1,28 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel cs_collision_detection
+
+struct obstacle
+{
+    float3 position;
+    float radius;
+};
+
+RWStructuredBuffer<obstacle> obstacles;
+RWStructuredBuffer<int> collision_count;
+float3 player_position;
+float player_radius;
+uint obstacle_count;
+
+[numthreads(8,1,1)]
+void cs_collision_detection (uint3 id : SV_DispatchThreadID)
+{
+    // TODO: insert actual code here!
+    obstacle obstacle = obstacles[id.x];
+    float3 diff = obstacle.position - player_position;
+    float sqr_dist = dot(diff, diff);
+    float min_dist = (obstacle.radius + 1) + player_radius;
+    if (sqr_dist < min_dist * min_dist)
+    {
+        collision_count[id.x] = 1;
+    }
+}
